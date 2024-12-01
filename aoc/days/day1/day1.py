@@ -1,36 +1,38 @@
 from aoc.helpers.lineReader import lineReader
+from collections import Counter
 
-content = lineReader()
+def parse_input(content):
+  left_numbers = []
+  right_numbers = []
 
-left_numbers = []
-right_numbers = []
+  for line in content:
+    s = line.split()
+    left_numbers.append(int(s[0]))
+    right_numbers.append(int(s[1]))
 
-for line in content:
-  s = line.split()
-  left_numbers.append(int(s[0]))
-  right_numbers.append(int(s[1]))
+  return left_numbers, right_numbers
+
 
 def part1(left_numbers, right_numbers):
-  left_numbers.sort()
-  right_numbers.sort()
+  left_sorted = sorted(left_numbers)
+  right_sorted = sorted(right_numbers)
 
-  total_distance = 0
+  total_distance = sum(abs(left - right) for left, right in zip(left_sorted, right_sorted))
+  return total_distance
 
-  for k, v in enumerate(left_numbers):
-    result = abs(v - right_numbers[k])
-    total_distance += result
-
-  print(total_distance)
-
-part1(left_numbers, right_numbers)
 
 def part2(left_numbers, right_numbers):
-  similarity_score = 0
+  right_counts = Counter(right_numbers)
 
-  for v in left_numbers:
-    amount = right_numbers.count(v)
-    similarity_score += (v * amount)
+  similarity_score = sum(v * right_counts[v] for v in left_numbers)
+  return similarity_score
 
-  print(similarity_score)
+if __name__ == "__main__":
+  content = lineReader()
+  left_numbers, right_numbers = parse_input(content)
 
-part2(left_numbers, right_numbers)
+  total_distance = part1(left_numbers, right_numbers)
+  print(f"Total Distance: {total_distance}")
+
+  similarity_score = part2(left_numbers, right_numbers)
+  print(f"Similarity Score: {similarity_score}")
