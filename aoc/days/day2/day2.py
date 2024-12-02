@@ -13,13 +13,12 @@ def determineDirection(c):
     # 0 = Neutral
     # 1 = Increasing
     # 2 = Decreasing
-    match c:
-        case c if c > 0:
-            return 1
-        case c if c < 0:
-            return 2
-        case _:
-            return 0
+    if c > 0:
+        return 1
+    elif c < 0:
+        return 2
+    else:
+        return 0
 
 
 def validDirection(d, ed):
