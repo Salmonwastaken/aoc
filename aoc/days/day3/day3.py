@@ -7,8 +7,7 @@ def parseInstructions(c):
     pat = re.compile(pattern=r"mul\((\d{1,3}),(\d{1,3})\)")
     total = 0
 
-    matches = re.finditer(pat, c)
-    for match in matches:
+    for match in re.finditer(pat, c):
         total += int(match.group(1)) * int(match.group(2))
 
     return total
@@ -25,10 +24,10 @@ def part2(content):
 
     # Find the first don't
     dont = content.find("don't()")
-    # Capture everything from do till don't or end of file (ignoring line endings)
+    # Capture everything from do() till don't() or end of file
     do = patternDo.findall(content)
 
-    # Capture everything from the start till that first don't
+    # Capture everything from the start till that first don't()
     enabledRange.append(content[0:dont])
     enabledRange += do
 
