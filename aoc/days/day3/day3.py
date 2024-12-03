@@ -20,17 +20,16 @@ def part1(content):
 
 def part2(content):
     patternDo = re.compile(r"do\(\)(.*?)(?:don't\(\)|$)", re.DOTALL)
-    patternDont = re.compile(pattern=r"don't\(\)")
 
     enabledRange = []
 
     # Find the first don't
-    dont = patternDont.search(content)
+    dont = content.find("don't()")
     # Capture everything from do till don't or end of file (ignoring line endings)
     do = patternDo.findall(content)
 
     # Capture everything from the start till that first don't
-    enabledRange.append(content[0 : dont.start()])
+    enabledRange.append(content[0:dont])
     enabledRange += do
 
     # Turn list of strings into one big happy string
