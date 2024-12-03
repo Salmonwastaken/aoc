@@ -2,7 +2,7 @@ import inspect
 import os
 
 
-def lineReader():
+def lineReader(lines=True):
     caller_frame = inspect.stack()[1]
     filename = os.path.dirname(caller_frame.filename) + "/input.txt"
 
@@ -12,6 +12,9 @@ def lineReader():
         print(f"Could not open {filename}, exiting")
         exit()
 
-    content = f.read().splitlines()
+    if lines:
+        content = f.read().splitlines()
+    else:
+        content = f.read()
 
     return content
