@@ -6,7 +6,7 @@ diagonals = [(-1, -1), (-1, 1), (1, -1), (1, 1)]
 directions = vertical + horizontal + diagonals
 
 
-def checkPattern(array, x, y, dx, dy):
+def checkPattern(array: list, x: int, y: int, dx: int, dy: int) -> bool:
     return (
         array[x + dx][y + dy] == "M"
         and array[x + 2 * dx][y + 2 * dy] == "A"
@@ -14,15 +14,15 @@ def checkPattern(array, x, y, dx, dy):
     )
 
 
-def checkBounds(array, x, y):
+def checkBounds(array: list, x: int, y: int) -> bool:
     return 0 <= x < len(array) and 0 <= y < len(array[0])
 
 
-def buildArray(content):
+def buildArray(content: str) -> list:
     return [list(line) for line in content.splitlines()]
 
 
-def part1(array):
+def part1(array: list) -> int:
     xmas = 0
 
     for x, line in enumerate(array):
@@ -39,7 +39,7 @@ def part1(array):
     return xmas
 
 
-def checkPattern2(array, x, y):
+def checkPattern2(array: list, x: int, y: int) -> bool:
     valid = ["SAM", "MAS"]
 
     diagonals = [
@@ -51,7 +51,7 @@ def checkPattern2(array, x, y):
     return all(diagonal in valid for diagonal in diagonals)
 
 
-def part2(array):
+def part2(array: list) -> int:
     xmas = 0
 
     for x, line in enumerate(array):

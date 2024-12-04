@@ -1,9 +1,10 @@
+from typing import Union
 import inspect
 import os
 
 
-def lineReader(lines=True):
-    caller_frame = inspect.stack()[1]
+def lineReader(lines: bool = True) -> Union[list[str], str]:
+    caller_frame: list = inspect.stack()[1]
     filename = os.path.dirname(caller_frame.filename) + "/input.txt"
 
     try:
@@ -13,8 +14,6 @@ def lineReader(lines=True):
         exit()
 
     if lines:
-        content = f.read().splitlines()
+        return f.read().splitlines()
     else:
-        content = f.read()
-
-    return content
+        return f.read()

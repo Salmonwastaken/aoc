@@ -3,7 +3,7 @@ from aoc.helpers.lineReader import lineReader
 import re
 
 
-def parseInstructions(c):
+def parseInstructions(c: str) -> int:
     pat = re.compile(pattern=r"mul\((\d{1,3}),(\d{1,3})\)")
     total = 0
 
@@ -13,11 +13,11 @@ def parseInstructions(c):
     return total
 
 
-def part1(content):
+def part1(content: str) -> int:
     return parseInstructions(content)
 
 
-def part2(content):
+def part2(content: str) -> int:
     patternDo = re.compile(r"do\(\)(.*?)(?:don't\(\)|$)", re.DOTALL)
 
     enabledRange = []

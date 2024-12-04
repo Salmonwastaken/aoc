@@ -3,7 +3,7 @@ from collections import Counter
 from aoc.helpers.lineReader import lineReader
 
 
-def parse_input(content):
+def parse_input(content: list[str]) -> tuple[list[int], list[int]]:
     left_numbers = []
     right_numbers = []
 
@@ -15,7 +15,7 @@ def parse_input(content):
     return left_numbers, right_numbers
 
 
-def part1(left_numbers, right_numbers):
+def part1(left_numbers: list[int], right_numbers: list[int]) -> int:
     left_sorted = sorted(left_numbers)
     right_sorted = sorted(right_numbers)
 
@@ -25,7 +25,7 @@ def part1(left_numbers, right_numbers):
     return total_distance
 
 
-def part2(left_numbers, right_numbers):
+def part2(left_numbers: list[int], right_numbers: list[int]) -> int:
     right_counts = Counter(right_numbers)
 
     similarity_score = sum(v * right_counts[v] for v in left_numbers)

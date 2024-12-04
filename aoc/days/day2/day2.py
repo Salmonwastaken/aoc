@@ -1,7 +1,8 @@
 from aoc.helpers.lineReader import lineReader
+from typing import Union, Tuple
 
 
-def validDistance(c):
+def validDistance(c: int) -> bool:
     match abs(c):
         case 1 | 2 | 3:
             return True
@@ -9,7 +10,7 @@ def validDistance(c):
             return False
 
 
-def determineDirection(c):
+def determineDirection(c: int) -> bool:
     # 0 = Neutral
     # 1 = Increasing
     # 2 = Decreasing
@@ -21,14 +22,11 @@ def determineDirection(c):
         return 0
 
 
-def validDirection(d, ed):
-    if d is not ed:
-        return False
-
-    return True
+def validDirection(d: int, ed: int) -> bool:
+    return d is ed
 
 
-def parse(res):
+def parse(res: list[str]) -> Tuple[bool, Union[int, None]]:
     for k, v in enumerate(res):
         if k == 0:
             expected_direction = 0
@@ -51,13 +49,13 @@ def parse(res):
     return True, None
 
 
-def counter(res, index):
+def counter(res: list[str], index: int) -> bool:
     new_res = [s for i, s in enumerate(res) if i != index]
     valid, _ = parse(new_res)
     return valid
 
 
-def part1(content):
+def part1(content: list[str]) -> int:
     safeReports = 0
 
     for line in content:
@@ -70,7 +68,7 @@ def part1(content):
     return safeReports
 
 
-def part2(content):
+def part2(content: list[str]) -> int:
     safeReports = 0
 
     for line in content:
