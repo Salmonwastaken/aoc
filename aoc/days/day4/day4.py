@@ -7,14 +7,11 @@ directions = vertical + horizontal + diagonals
 
 
 def checkPattern(array, x, y, dx, dy):
-    try:
-        return (
-            array[x + dx][y + dy] == "M"
-            and array[x + 2 * dx][y + 2 * dy] == "A"
-            and array[x + 3 * dx][y + 3 * dy] == "S"
-        )
-    except IndexError:
-        return False
+    return (
+        array[x + dx][y + dy] == "M"
+        and array[x + 2 * dx][y + 2 * dy] == "A"
+        and array[x + 3 * dx][y + 3 * dy] == "S"
+    )
 
 
 def checkBounds(array, x, y):
@@ -45,16 +42,13 @@ def part1(array):
 def checkPattern2(array, x, y):
     valid = ["SAM", "MAS"]
 
-    try:
-        diagonals = [
-            array[x - 1][y - 1] + array[x][y] + array[x + 1][y + 1],
-            array[x - 1][y + 1] + array[x][y] + array[x + 1][y - 1],
-            array[x + 1][y - 1] + array[x][y] + array[x - 1][y + 1],
-            array[x + 1][y + 1] + array[x][y] + array[x - 1][y - 1],
-        ]
-        return all(diagonal in valid for diagonal in diagonals)
-    except IndexError:
-        return False
+    diagonals = [
+        array[x - 1][y - 1] + array[x][y] + array[x + 1][y + 1],
+        array[x - 1][y + 1] + array[x][y] + array[x + 1][y - 1],
+        array[x + 1][y - 1] + array[x][y] + array[x - 1][y + 1],
+        array[x + 1][y + 1] + array[x][y] + array[x - 1][y - 1],
+    ]
+    return all(diagonal in valid for diagonal in diagonals)
 
 
 def part2(array):
