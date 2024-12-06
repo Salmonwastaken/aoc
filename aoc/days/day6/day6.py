@@ -1,6 +1,4 @@
 from aoc.helpers.lineReader import lineReader
-from collections import defaultdict
-from copy import deepcopy
 from typing import Union
 
 
@@ -17,25 +15,25 @@ def checkBounds(array: list, x: int, y: int) -> bool:
 # Find the starting position marked by '^'
 def findStart(field: list) -> tuple:
     for number, row in enumerate(field):
-        try:
+        if "^" in row:
             return (number, row.index("^"))
-        except ValueError:
-            pass
+    return None
 
 
-# Traverse the field while checking for obstacles and loop detection
+# Directions: (UP, RIGHT, DOWN, LEFT)
+DIRECTIONS = [(-1, 0), (0, 1), (1, 0), (0, -1)]
+
+
 def traverseField(
-    field: list, x: int, y: int, newObstacle: tuple = ()
+    field: list, x: int, y: int, checkForLoop: bool = False
 ) -> Union[set, bool]:
     visited = {(x, y)}
-
-    degrees = 0
-    movementHash = {0: (-1, 0), 90: (0, 1), 180: (1, 0), 270: (0, -1)}
-
-    hitObstacles = defaultdict(bool)
+    direction = 0
+    visitedObstacles = set()
 
     while True:
-        newX, newY = x + movementHash[degrees][0], y + movementHash[degrees][1]
+        dx, dy = DIRECTIONS[direction]
+        newX, newY = x + dx, y + dy
 
         if not checkBounds(field, newX, newY):
             break
@@ -43,44 +41,48 @@ def traverseField(
         nextStep = field[newX][newY]
 
         if nextStep == "#":
-            if newObstacle:
+            if checkForLoop:
                 obstacleLocation = (newX, newY)
-                tupleKey = (degrees, (x, y), obstacleLocation)
-                if hitObstacles[tupleKey]:  # We hit the obstacle again
+                stateKey = (direction, (x, y), obstacleLocation)
+                # Unique key already exists, so we've hit it a second time
+                # This means we're looping!
+                if stateKey in visitedObstacles:
                     return True
 
-                hitObstacles[tupleKey] = True
+                visitedObstacles.add(stateKey)
 
-            degrees = (degrees + 90) % 360
+            # Turn 90 degrees clockwise
+            direction = (direction + 1) % 4
             continue
         else:
             x, y = newX, newY
             visited.add((x, y))
 
-    return visited if not newObstacle else False
+    return visited if not checkForLoop else False
 
 
-# Part 1: Traverse the field and return the number of visited locations
 def part1(field: list, x: int, y: int) -> int:
     visited = traverseField(field, x, y)
     return len(visited)
 
 
-# Part 2: Count valid obstacles that block the path without causing loops
 def part2(field: list, x: int, y: int) -> int:
     visited = traverseField(field, x, y)
     validObstacles = 0
 
     for location in visited:
         if location == (x, y):
-            continue  # Skip the initial location
+            continue
 
-        # Create a new field with the obstacle at the current location
-        newField = deepcopy(field)
-        newField[location[0]][location[1]] = "#"
+        # Temporarily block the location
+        field[location[0]][location[1]] = "#"
 
-        if traverseField(newField, x, y, (location[0], location[1])):
+        # Check if whether the new path generates a loop
+        if traverseField(field, x, y, checkForLoop=True):
             validObstacles += 1
+
+        # Revert the field to the original state
+        field[location[0]][location[1]] = "."
 
     return validObstacles
 
