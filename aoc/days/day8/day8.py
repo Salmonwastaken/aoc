@@ -1,5 +1,6 @@
 from aoc.helpers.lineReader import lineReader
 from collections import defaultdict
+from itertools import combinations
 
 
 def buildArray(content: str) -> list:
@@ -24,59 +25,32 @@ def parseInput(field: list) -> dict:
     return antennas
 
 
-def part1(field: list, antennas: dict) -> int:
+def calculateAntinodes(field: list, antennas: dict, propagate: bool = False) -> int:
     antinodes = set()
 
     # Loop through antennas and mark spawned antinodes
     for antenna, locations in antennas.items():
-        if len(locations) == 1:
+        # No possible antinodes, idk if it even occurs.
+        if len(locations) <= 1:
             pass
+
         # Check the distance between every location for every location
         for startX, startY in locations:
             for locationX, locationY in locations:
-                xDiff = startX - locationX
-                yDiff = startY - locationY
-                # Same location, so we can skip
+                xDiff, yDiff = startX - locationX, startY - locationY
+                # # Same location, so we can skip
                 if xDiff == 0 and yDiff == 0:
+                    if propagate:
+                        antinodes.add((startX, startY))
                     continue
 
-                newX = startX + xDiff
-                newY = startY + yDiff
-
-                # We only add once, apparently ( i had a while loop here that goes over all of them )
-                if checkBounds(field, newX, newY):
-                    antinodes.add((newX, newY))
-                    # field[newX][newY] = "#"
-                    # newX += xDiff
-                    # newY += yDiff
-
-    return len(antinodes)
-
-
-def part2(field: list, antennas: dict) -> int:
-    antinodes = set()
-
-    # Loop through antennas and mark spawned antinodes
-    for antenna, locations in antennas.items():
-        if len(locations) == 1:
-            pass
-        # Check the distance between every location for every location
-        for startX, startY in locations:
-            for locationX, locationY in locations:
-                xDiff = startX - locationX
-                yDiff = startY - locationY
-                # Same location, so we can skip
-                if xDiff == 0 and yDiff == 0:
-                    continue
-
-                antinodes.add((startX, startY))
-
-                newX = startX + xDiff
-                newY = startY + yDiff
+                newX, newY = startX + xDiff, startY + yDiff
 
                 # Now we add em all
                 while checkBounds(field, newX, newY):
                     antinodes.add((newX, newY))
+                    if not propagate:
+                        break
                     newX += xDiff
                     newY += yDiff
 
@@ -90,7 +64,7 @@ if __name__ == "__main__":
 
     antennas = parseInput(field)
 
-    anti1 = part1(field, antennas)
+    anti1 = calculateAntinodes(field, antennas)
     print(anti1)
-    anti2 = part2(field, antennas)
+    anti2 = calculateAntinodes(field, antennas, True)
     print(anti2)
