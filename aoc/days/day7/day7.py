@@ -1,33 +1,31 @@
 from aoc.helpers.lineReader import lineReader
-
-# Operators are always evaluated left-to-right, not according to precedence rules!
-OPERATORS = ["+", "*"]
+from itertools import product
 
 
-def isValid(result, rest):
-    if len(rest) == 1:
-        return rest[0] == result
-
-    last = rest[-1]
-
-    if result % last == 0:
-        possible_mul = isValid(result // last, rest[:-1])
-    else:
-        possible_mul = False
-
-    possible_add = isValid(result - last, rest[:-1])
-    return possible_mul or possible_add
+def test(combo, numbers):
+    ans = numbers[0]
+    for i in range(1, len(numbers)):
+        if combo[i - 1] == "+":
+            ans += numbers[i]
+        elif combo[i - 1] == "|":
+            ans = int(f"{ans}{numbers[i]}")
+        else:
+            ans *= numbers[i]
+    return ans
 
 
-def part1(content):
+def run(lines, ops):
     total = 0
 
-    for line in content:
-        split = line.split(":")
-        value = int(split[0])
-        numbers = [int(n) for n in split[1].lstrip().split()]
-        if isValid(value, numbers):
-            total += value
+    for i, line in enumerate(lines):
+        parts = line.split()
+        value = int(parts[0][:-1])
+        numbers = list(map(int, parts[1:]))
+
+        for combo in product(ops, repeat=len(numbers) - 1):
+            if test(combo, numbers) == value:
+                total += value
+                break
 
     return total
 
@@ -35,5 +33,7 @@ def part1(content):
 if __name__ == "__main__":
     content = lineReader()
 
-    p1 = part1(content)
+    p1 = run(content, "+*")
     print(f"Part 1: {p1}")
+    p2 = run(content, "+*|")
+    print(f"Part 2: {p2}")
