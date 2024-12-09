@@ -1,6 +1,5 @@
 from aoc.helpers.lineReader import lineReader
 from collections import defaultdict
-from itertools import combinations
 
 
 def buildArray(content: str) -> list:
