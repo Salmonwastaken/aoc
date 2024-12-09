@@ -52,7 +52,6 @@ def findFreeRanges(output: list) -> list:
 # Build a list like in the example
 # 2333133121414131402 -> 00...111...2...333.44.5555.6666.777.888899
 def buildBlock(content: str) -> list:
-    print("".join(content))
     file = True
     blockID = 0
     output = []
