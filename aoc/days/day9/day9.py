@@ -1,5 +1,4 @@
 from aoc.helpers.lineReader import lineReader
-from typing import Union
 
 
 def containsDigit(lst: list) -> bool:
