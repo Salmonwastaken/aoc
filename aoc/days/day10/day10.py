@@ -26,11 +26,8 @@ def findStarts(array: list) -> list:
 
 def isValid(array: list, x: int, y: int, path, expectedNumber: str) -> bool:
     return (
-        # Nout outside of Bounds
         checkBounds(array, x, y)
-        # Not previously traversed on the current path
         and (x, y) not in path
-        # Would it be the correct step for the current path from 0 through 9
         and array[x][y] == str(expectedNumber)
     )
 
@@ -68,12 +65,12 @@ if __name__ == "__main__":
     field = buildArray(content)
     startLocations = findStarts(field)
 
-    # p1 = 0
+    p1 = 0
 
-    # for x, y in startLocations:
-    #     paths1 = dfs(field, x, y)
-    #     p1 += len(paths1)
-    # print(p1)
+    for x, y in startLocations:
+        paths1 = dfs(field, x, y)
+        p1 += len(paths1)
+    print(p1)
 
     p2 = 0
 
