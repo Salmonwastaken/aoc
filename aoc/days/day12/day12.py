@@ -1,7 +1,5 @@
 from aoc.helpers.lineReader import lineReader
-from collections import defaultdict
 from dataclasses import dataclass
-from itertools import product
 
 vertical = [(-1, 0), (1, 0)]
 horizontal = [(0, -1), (0, 1)]
@@ -50,6 +48,50 @@ def dfs(grid, startX, startY, crop):
     return region, perimeters
 
 
+def countCorners(grid, area, crop):
+    corners = 0
+
+    directions = {
+        #       NW       N      W
+        "NW": (-1, -1, -1, 0, 0, -1),
+        #        NE      N     E
+        "NE": (-1, 1, -1, 0, 0, 1),
+        #        SW     W      S
+        "SW": (1, -1, 0, -1, 1, 0),
+        #       SE     E     S
+        "SE": (1, 1, 0, 1, 1, 0),
+    }
+
+    for x, y in area:
+        for _, (x1, y1, x2, y2, x3, y3) in directions.items():
+            corner_x, corner_y = x + x1, y + y1
+            side1_x, side1_y = x + x2, y + y2
+            side2_x, side2_y = x + x3, y + y3
+
+            corner_value = (
+                grid[corner_x][corner_y]
+                if checkBounds(grid, corner_x, corner_y)
+                else "."
+            )
+
+            side1_value = (
+                grid[side1_x][side1_y] if checkBounds(grid, side1_x, side1_y) else "."
+            )
+
+            side2_value = (
+                grid[side2_x][side2_y] if checkBounds(grid, side2_x, side2_y) else "."
+            )
+
+            if corner_value != crop and side1_value == crop and side2_value == crop:
+                corners += 1
+            elif corner_value != crop and side1_value != crop and side2_value != crop:
+                corners += 1
+            elif corner_value == crop and side1_value != crop and side2_value != crop:
+                corners += 1
+
+    return corners
+
+
 def parse(field):
     visited = [[False for _ in line] for line in content]
     regions = list()
@@ -58,18 +100,12 @@ def parse(field):
         for y, crop in enumerate(line):
             if not visited[x][y]:
                 patch, perimeters = dfs(field, x, y, crop)
-                # if crop == "B":
-                #     print(perimeters)
-                #     find_sides(patch, perimeters)
-                #     exit()
-                # else:
-                #     continue
                 region = Region(
                     crop=crop,
                     coordinates=patch,
                     area=len(patch),
                     perimeter=len(perimeters),
-                    sides=find_sides(patch, perimeters),
+                    sides=countCorners(field, patch, crop),
                 )
                 regions.append(region)
                 for locationx, locationy in region.coordinates:
@@ -87,6 +123,15 @@ def price1(regions):
     return total
 
 
+def price2(regions):
+    total = 0
+    for region in regions:
+        region.price = region.area * region.sides
+        total += region.price
+
+    return total
+
+
 if __name__ == "__main__":
     content = lineReader()
 
@@ -94,12 +139,7 @@ if __name__ == "__main__":
 
     regions = parse(field)
 
-    for region in regions:
-        print(
-            f"{region.crop} has {region.sides} sides and this patch {region.coordinates}"
-        )
-
     p1 = price1(regions)
     print(f"Part 1: {p1}")
-    # p2 = price2(regions)
-    # print(f"Part 2: {p2}")
+    p2 = price2(regions)
+    print(f"Part 2: {p2}")
