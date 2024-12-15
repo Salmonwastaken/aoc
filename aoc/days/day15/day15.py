@@ -1,5 +1,4 @@
 from aoc.helpers.lineReader import lineReader
-from collections import defaultdict
 
 
 def buildArray(content: list) -> list:
