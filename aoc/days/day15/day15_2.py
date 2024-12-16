@@ -1,107 +1,180 @@
-from aoc.helpers.lineReader import lineReader
+# Entirely based on https://www.youtube.com/watch?v=zYvZS68tPsU
+# Couldn't wrap my head around managing the 2-wide boxes..
+
+with open("input.txt") as fin:
+    parts = fin.read().strip().split("\n\n")
+    grid = [list(line) for line in parts[0].split("\n")]
+    steps = parts[1].replace("\n", "")
+
+dirs = {"<": [0, -1], "v": [1, 0], ">": [0, 1], "^": [-1, 0]}
+
+n = len(grid)
+
+# We collect all the locations of walls and *LEFT* sides of boxes.
+boxes = []
+walls = []
+for i in range(n):
+    for j in range(n):
+        if grid[i][j] == "@":
+            ci, cj = i, j * 2
+        elif grid[i][j] == "O":
+            boxes.append([i, j * 2])
+        elif grid[i][j] == "#":
+            walls.append([i, j * 2])
+            walls.append([i, j * 2 + 1])
 
 
-def buildArray(content: list) -> list:
-    return [list(line) for line in content]
+def in_grid(i, j):
+    return (0 <= i < n) and (0 <= j < 2 * n)
 
 
-def find_start(field):
-    for key, line in enumerate(field):
-        if "@" in line:
-            return key, line.index("@")
+def move(dir):
+    global ci, cj, grid
+
+    newi, newj = ci + dir[0], cj + dir[1]
+    # The robot landed outside the grid, which is pretty hard to do aka shouldnt happen
+    if not in_grid(newi, newj):
+        return
+
+    # The robot would end up in a wall, so we cancel the move
+    if [newi, newj] in walls:
+        return
+
+    # We see if the next step or the one on the left of it would land us on a left-side of a box (since that's all we track)
+    # If we do, we gather it
+    stack = []
+    if [newi, newj] in boxes:
+        stack.append([newi, newj])
+    if [newi, newj - 1] in boxes:
+        stack.append([newi, newj - 1])
+
+    can_move = True
+
+    # While we found a box, we have to check if there's any boxes connected to it.
+    # We use a DFS to find all connected boxes
+    seen = set()
+    while len(stack) > 0:
+        topi, topj = stack.pop()
+        ni, nj = topi + dir[0], topj + dir[1]
+
+        if not in_grid(ni, nj):
+            can_move = False
+            break
+
+        # Running into a wall always means we cannot move at all
+        if [ni, nj] in walls or [ni, nj + 1] in walls:
+            can_move = False
+            break
+
+        # Did we see this box already?
+        if (topi, topj) in seen:
+            continue
+        seen.add((topi, topj))
+
+        # Check if our next step is a place where a box currently is
+        # I added some examples, where ( is the current box location and { is the box it would detect
+        # This is a left move, <
+        ##############
+        ##......##..##
+        ##..........##
+        ##....[][]@.##
+        ##....[]....##
+        ##..........##
+        ##############
+        # detects:
+        ##############
+        ##......##..##
+        ##..........##
+        ##....{}()@.##
+        ##....[]....##
+        ##..........##
+        ##############
+        if [ni, nj] in boxes:
+            stack.append([ni, nj])
+
+        # To check for left halves one to the left (eg an upwards move)
+        ##############
+        ##......##..##
+        ##..........##
+        ##...[][]...##
+        ##....[]....##
+        ##.....@....##
+        ##############
+        # detects:
+        ##############
+        ##......##..##
+        ##..........##
+        ##...{}[]...##
+        ##....()....##
+        ##.....@....##
+        ##############
+        if [ni, nj - 1] in boxes:
+            stack.append([ni, nj - 1])
+
+        # To check for left halves one to the right (eg an upwards move)
+        ##############
+        ##......##..##
+        ##..........##
+        ##...[][]...##
+        ##....[]....##
+        ##.....@....##
+        ##############
+        # detects:
+        ##############
+        ##......##..##
+        ##..........##
+        ##...[]{}...##
+        ##....()....##
+        ##.....@....##
+        ##############
+        if [ni, nj + 1] in boxes:
+            stack.append([ni, nj + 1])
+
+    # Handling the cases where we can't move the boxes (eg wall)
+    if not can_move:
+        return
+
+    for i, box in enumerate(boxes):
+        # Start moving all the boxes we saw in our DFS
+        # By simply adding the direction to their location
+        if tuple(box) in seen:
+            boxes[i][0] += dir[0]
+            boxes[i][1] += dir[1]
+
+    # Update the robot position
+    ci += dir[0]
+    cj += dir[1]
 
 
-def create_new_field(field):
-    new_field = [[[] for _ in range(len(field[0] * 2))] for _ in range(len(field))]
-
-    for x, line in enumerate(field):
-        for y, c in enumerate(line):
-            if c == "#":
-                first_val, second_val = "#", "#"
-            elif c == "O":
-                first_val, second_val = "[", "]"
-            elif c == ".":
-                first_val, second_val = ".", "."
-            elif c == "@":
-                first_val, second_val = "@", "."
-            new_field[x][y * 2], new_field[x][y * 2 + 1] = first_val, second_val
-
-    return new_field
-
-
-def push(field, start_x, start_y, dx, dy):
-    start_field = field[start_x][start_y]
-
-    if start_field == "[":
-        box = ((start_x, start_y), (start_x, start_y + 1))
-    elif start_field == "]":
-        box = ((start_x, start_y - 1), (start_x, start_y))
-
-    if next_field == "#":
-        print("Do Nothing")
-    elif next_field == ".":
-        print("Move box to new node")
-    elif next_field == "[" or next_field == "]":
-        print("Another box, let's see if we can push it")
-
-
-if __name__ == "__main__":
-    content = lineReader()
-    mid = content.index("")
-    instructions = "".join(content[mid + 1 :])
-    field = buildArray(content[:mid])
-
-    instruction_translator = {"^": (-1, 0), ">": (0, 1), "v": (1, 0), "<": (0, -1)}
-
-    # Original field
-    for line in field:
-        for c in line:
-            print(c, end=" ")
+# Visual representation for debugging
+def print_grid(boxes, walls, ci, cj):
+    for i in range(n):
+        for j in range(n * 2):
+            if [i, j] in walls:
+                print("#", end="")
+            elif [i, j] in boxes:
+                print("[", end="")
+            elif [i, j - 1] in boxes:
+                print("]", end="")
+            elif (i, j) == (ci, cj):
+                print("@", end="")
+            else:
+                print(".", end="")
         print()
     print()
-    # Create new field
-    field = create_new_field(field)
-    # New field
-    for line in field:
-        for c in line:
-            print(c, end=" ")
-        print()
-    print()
 
-    x, y = find_start(field)
 
-    for instruction in instructions:
-        dx, dy = instruction_translator[instruction]
-        next_x, next_y = x + dx, y + dy
+print_grid(boxes, walls, ci, cj)
 
-        next_field = field[next_x][next_y]
+for step in steps:
+    move(dirs[step])
+    # This bloats the runtime massively on the actual input
+    # print_grid(boxes, walls, ci, cj)
 
-        if next_field == "#":
-            print("Do Nothing")
-        elif next_field == ".":
-            print("Move robot to new node")
-            field[next_x][next_y], field[x][y] = field[x][y], field[next_x][next_y]
-            x, y = next_x, next_y
-        elif next_field == "[" or next_field == "]":
-            push(field, x + dx, y + dx, dx, dy)
-            print("Attempt to push")
+print_grid(boxes, walls, ci, cj)
 
-        for line in field:
-            for c in line:
-                print(c, end=" ")
-            print()
-        print()
+total = 0
+for i, j in boxes:
+    total += i * 100 + j
 
-    # Find closest/leftmost edge of every box
-    boxes = [
-        (x, y)
-        for x, line in enumerate(field)
-        for y, val in enumerate(line)
-        if val == "["
-    ]
-
-    total = 0
-    for box_x, box_y in boxes:
-        total += box_x * 100 + box_y
-
-    print(total)
+print(total)
