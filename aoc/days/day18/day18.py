@@ -49,9 +49,10 @@ def a_star(field, cost, start_x, start_y, finish_x, finish_y):
     while pq:
         f, g, x, y, path = heappop(pq)
 
-        clear_console()
-        print_path(field, path + [(x, y)])
-        time.sleep(0.01)
+        # Slows it down a LOT but handy for debug
+        # clear_console()
+        # print_path(field, path + [(x, y)])
+        # time.sleep(0.01)
 
         if (x, y) == (finish_x, finish_y):
             return path
@@ -72,11 +73,11 @@ def a_star(field, cost, start_x, start_y, finish_x, finish_y):
     return None
 
 
-X_LEN = 71
-Y_LEN = 71
-BYTES = 1024
-
 content = lineReader()
+
+X_LEN = 71 if len(content) > 1000 else 7
+Y_LEN = 71 if len(content) > 1000 else 7
+BYTES = 1024 if len(content) > 1000 else 12
 
 blockades = [
     (int(x), int(y)) for entry in content[:BYTES] for x, y in [entry.split(",")]
