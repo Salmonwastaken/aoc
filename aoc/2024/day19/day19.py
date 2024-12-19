@@ -38,7 +38,7 @@ patterns = content[2:]
 possible_towels = 0
 
 for pattern in tqdm(patterns):
-    if has_valid_combination(tuple(towels), pattern):
+    if has_valid_combination(towels, pattern):
         possible_towels += 1
 
 
