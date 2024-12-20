@@ -2,6 +2,10 @@
 from collections import deque
 
 
+def build_array(content):
+    return [list(line) for line in content]
+
+
 def check_bounds(array, x, y):
     """
     Checks if the given coordinates are within the bounds of the 2D array.
