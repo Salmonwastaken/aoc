@@ -50,11 +50,10 @@ for rotation in dialtable:
     answer += roundtrips
     amount -= roundtrips * 100
 
-    # Check wether we start from 0 and if our action crosses the 0 threshold.
+    # Check whether we start from 0 and if our action crosses the 0 threshold.
     # This knocks it down to 0.09s
     end_location = eval(str(location) + op + str(amount))
     if (end_location <= 0 and location != 0) or (end_location >= 100 and location != 0):
-        last_answer = answer
         answer += 1
     location = end_location % 100
 
