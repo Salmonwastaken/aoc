@@ -20,13 +20,6 @@ for rs, re in ranges.items():
     last_start = max(merged_ranges.keys())
     last_end = merged_ranges[last_start]
 
-    # Example:
-    # current last: 10-20
-    # actions if new is:
-    # 6-18; impossible, because input is sorted hence no need for additional bound checking
-    # 11-18; 11 <= 19 (True); max(20, 18); merged_ranges[10] = 18
-    # 21-25; 21 <= 21 (True); max(20, 25); merged_ranges[10] = 25
-    # 22-30; 22 <= 30 (False); merged_ranges[22] = 30
     if rs <= last_end + 1:
         merged_ranges[last_start] = max(last_end, re)
     else:
